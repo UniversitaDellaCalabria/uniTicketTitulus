@@ -1,0 +1,45 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- LOGICA OP ---
+        const addOpBtn = document.getElementById('add-op-row');
+        const opContainer = document.getElementById('op-formset-container');
+        const emptyOpTemplate = document.getElementById('empty-form-op-template').innerHTML;
+        const opTotalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');
+
+        addOpBtn.addEventListener('click', function () {
+            const formCount = parseInt(opTotalForms.value);
+            opContainer.insertAdjacentHTML('beforeend', emptyOpTemplate.replace(/__prefix__/g, formCount));
+            opTotalForms.value = formCount + 1;
+        });
+
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.remove-op-btn');
+            if (btn) {
+                const row = btn.closest('.op-form-row');
+                const del = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                if (del) { del.checked = true; row.style.display = 'none'; } else { row.remove(); }
+            }
+        });
+
+        // --- LOGICA CC ---
+        const addCcBtn = document.getElementById('add-cc-row');
+        const ccContainer = document.getElementById('cc-formset-container');
+        const emptyCcTemplate = document.getElementById('empty-form-cc-template').innerHTML;
+        const ccTotalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');
+
+        addCcBtn.addEventListener('click', function () {
+            const formCount = parseInt(ccTotalForms.value);
+            ccContainer.insertAdjacentHTML('beforeend', emptyCcTemplate.replace(/__prefix__/g, formCount));
+            ccTotalForms.value = formCount + 1;
+        });
+
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.remove-cc-btn');
+            if (btn) {
+                const row = btn.closest('.cc-form-row');
+                const del = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                if (del) { del.checked = true; row.style.display = 'none'; } else { row.remove(); }
+            }
+        });
+    });
+</script>

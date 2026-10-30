@@ -1,0 +1,24 @@
+{% load i18n %}
+{% load static %}
+
+
+<div class="accordion-item">
+    <h2 class="accordion-header " id="headingProtocol">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProtocol" aria-expanded="false" aria-controls="collapseProtocol">
+            {% trans "Configurazioni protocollo informatico" %} ({{ protocol_configurations.count }})
+        </button>
+    </h2>
+    <div id="collapseProtocol" class="accordion-collapse collapse" data-bs-parent="#accordionDiv1lft" role="region" aria-labelledby="headingProtocol">
+        <div class="accordion-body">
+            {% include "protocol/category_protocol_configurations.html" with protocol_configurations=protocol_configurations %}
+            <div class="d-grid gap-2">
+                <a class="btn btn-outline-success mt-4"
+                    href="{% url 'uni_ticket_titulus:manager_category_protocol_configuration_new' structure_slug=structure.slug category_slug=category.slug %}">
+                    <svg class="icon icon-xs icon-success">
+                        <use xlink:href="/static/svg/sprites.svg#it-plus-circle"></use>
+                    </svg> {% trans "Aggiungi nuova configurazione" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

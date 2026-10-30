@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+include uni_ticket_titulus/static/js/ *.js
+recursive-include uni_ticket_titulus/templates/ *.html

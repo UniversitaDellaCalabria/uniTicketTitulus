@@ -1,0 +1,338 @@
+{% extends "form_complete.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block menu_links %}
+{% include 'manager/main_menu.html' %}
+{% endblock menu_links %}
+
+{% block top_buttons %}
+<a role="button" class="btn btn-outline-secondary"
+   href="{% url 'uni_ticket:manager_dashboard' structure_slug=structure.slug %}">
+    <svg class="icon icon-xs">
+        <use xlink:href="{% static 'svg/sprites.svg' %}#it-arrow-left"></use>
+    </svg> {% trans "Dashboard" %}
+</a>
+<a role="button" class="btn btn-outline-secondary"
+   href="{% url 'uni_ticket:manager_category_detail' structure_slug=structure.slug category_slug=category.slug %}">
+    <svg class="icon icon-xs">
+        <use xlink:href="{% static 'svg/sprites.svg' %}#it-arrow-left"></use>
+    </svg> {% trans "Torna alla tipologia di richiesta" %}
+</a>
+
+{% if configuration.is_active %}
+<button type="button"
+        class="btn btn-outline-secondary"
+        data-bs-toggle="modal"
+        data-bs-target="#disableConfiguration">
+        <svg class="icon icon-xs">
+            <use xlink:href="{% static 'svg/sprites.svg' %}#it-password-invisible"></use>
+        </svg> {% trans "Disattiva" %}
+</button>
+{% else %}
+<button type="button"
+        class="btn btn-outline-secondary"
+        data-bs-toggle="modal"
+        data-bs-target="#enableConfiguration">
+        <svg class="icon icon-xs">
+            <use xlink:href="{% static 'svg/sprites.svg' %}#it-password-visible"></use>
+        </svg> {% trans "Attiva" %}
+</button>
+{% endif %}
+<button type="button"
+        class="btn btn-outline-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteConfiguration">
+        <svg class="icon icon-xs icon-danger">
+            <use xlink:href="{% static 'svg/sprites.svg' %}#it-close-circle"></use>
+        </svg> {% trans "Elimina" %}
+</button>
+{% endblock top_buttons %}
+
+{% block clean_content %}
+<div class="row">
+    <div class="col">
+        <article class="it-card rounded shadow">
+            <div class="it-card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% include 'form_template.html' %}
+                    
+                    <hr class="my-5">
+                    <p class="h5 mb-4">{% trans "Configurazione flusso" %}</p>
+
+                    {% include 'form_template.html' with form=form_advanced_conf %}
+                    
+                    <hr class="my-5">
+                    <p class="h5 mb-4">{% trans "Operatore destinatario" %}</p>
+
+                    <div id="op-formset-container">
+                        {{ formset_op.management_form }}
+                        {% for op_form in formset_op %}
+                        <div class="op-form-row mb-4 pb-3 border-bottom position-relative">
+                            {% for field in op_form.visible_fields %}
+                                {% if field.name != 'DELETE' %}
+                                <div style="padding: 0 0 1rem; width: 100%">
+                                    <b>{{ field.label_tag }}</b>
+                                    {% if field.field.required %}*{% endif %}
+                                    <div style="width: 100%">
+                                        {{ field }}
+                                    </div>
+                                    {% if field.errors %}
+                                    <ul class="text-danger list-unstyled mt-1 fw-bold">
+                                        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="text-end mt-2">
+                                {% if formset_op.can_delete %}
+                                <div class="d-none">{{ op_form.DELETE }}</div>
+                                {% endif %}
+                                <button type="button" class="btn btn-outline-danger btn-xs remove-op-btn">
+                                    <svg class="icon icon-xs icon-danger me-1"><use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use></svg>
+                                    {% trans "Rimuovi" %}
+                                </button>
+                            </div>
+                            {% for hidden in op_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div id="empty-form-op-template" style="display: none;">
+                        <div class="op-form-row mb-4 pb-3 border-bottom position-relative">
+                            {% for field in formset_op.empty_form.visible_fields %}
+                                {% if field.name != 'DELETE' %}
+                                <div style="padding: 0 0 1rem; width: 100%">
+                                    <b>{{ field.label_tag }}</b>
+                                    {% if field.field.required %}*{% endif %}
+                                    <div style="width: 100%">
+                                        {{ field }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            <div class="text-end mt-2">
+                                <button type="button" class="btn btn-outline-danger btn-xs remove-op-btn">
+                                    <svg class="icon icon-xs icon-danger me-1">
+                                        <use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use>
+                                    </svg> {% trans "Rimuovi" %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="add-op-row" class="btn btn-outline-success btn-sm mb-4 mt-2">
+                        <svg class="icon icon-xs icon-success me-1">
+                            <use xlink:href="{% static 'svg/sprites.svg' %}#it-plus"></use>
+                        </svg> {% trans "Aggiungi Operatore" %}
+                    </button>
+
+                    <hr class="my-5">
+                    <p class="h5 mb-4">{% trans "Destinatari in copia conoscenza (CC)" %}</p>
+
+                    <div id="cc-formset-container">
+                        {{ formset_cc.management_form }}
+                        {% for cc_form in formset_cc %}
+                        <div class="cc-form-row mb-4 pb-3 border-bottom position-relative">
+                            {% for field in cc_form.visible_fields %}
+                                {% if field.name != 'DELETE' %}
+                                <div style="padding: 0 0 1rem; width: 100%">
+                                    <b>{{ field.label_tag }}</b>
+                                    {% if field.field.required %}*{% endif %}
+                                    <div style="width: 100%">
+                                        {{ field }}
+                                    </div>
+                                    {% if field.errors %}
+                                    <ul class="text-danger list-unstyled mt-1 fw-bold">
+                                        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="text-end mt-2">
+                                {% if formset_cc.can_delete %}
+                                <div class="d-none">{{ cc_form.DELETE }}</div>
+                                {% endif %}
+                                <button type="button" class="btn btn-outline-danger btn-xs remove-cc-btn">
+                                    <svg class="icon icon-xs icon-danger me-1"><use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use></svg>
+                                    {% trans "Rimuovi CC" %}
+                                </button>
+                            </div>
+                            {% for hidden in cc_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div id="empty-form-cc-template" style="display: none;">
+                        <div class="cc-form-row mb-4 pb-3 border-bottom position-relative">
+                            {% for field in formset_cc.empty_form.visible_fields %}
+                                {% if field.name != 'DELETE' %}
+                                <div style="padding: 0 0 1rem; width: 100%">
+                                    <b>{{ field.label_tag }}</b>
+                                    {% if field.field.required %}*{% endif %}
+                                    <div style="width: 100%">
+                                        {{ field }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            <div class="text-end mt-2">
+                                <button type="button" class="btn btn-outline-danger btn-xs remove-cc-btn">
+                                    <svg class="icon icon-xs icon-danger me-1"><use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use></svg>
+                                    {% trans "Rimuovi CC" %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="add-cc-row" class="btn btn-outline-success btn-sm mb-4 mt-2">
+                        <svg class="icon icon-xs icon-success me-1">
+                            <use xlink:href="{% static 'svg/sprites.svg' %}#it-plus"></use>
+                        </svg> {% trans "Aggiungi Persona in CC" %}
+                    </button>
+
+                    {% block form_buttons %}
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success"
+                                type="button"
+                                data-confirm-modal="#updateConfiguration">
+                            <svg class="icon icon-xs icon-white">
+                                <use xlink:href="{% static 'svg/sprites.svg' %}#it-check"></use>
+                            </svg> {% trans 'Salva configurazione' %}
+                        </button>
+                    </div>
+                    <div class="modal fade" tabindex="-1" role="dialog" id="updateConfiguration">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        {% trans "Aggiornamento configurazione protocollo informatico" %}
+                                    </h5>
+                                    <button class="btn-close"
+                                            type="button"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                       <svg class="icon">
+                                          <use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use>
+                                       </svg>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        {% trans "Vuoi davvero aggiornare la configurazione" %}?
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <input class="btn btn-success"
+                                           type="submit"
+                                           id="submitForm"
+                                           value="{% trans 'Si, procedi' %}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endblock form_buttons %}
+                </form>
+            </div>
+        </article>
+    </div>
+</div>
+
+{% if configuration.is_active %}
+<div class="modal fade" tabindex="-1" role="dialog" id="disableConfiguration">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% trans "Disattivazione configurazione protocollo" %}
+                </h5>
+                <button class="btn-close" type="button"
+                        data-bs-dismiss="modal" aria-label="Close">
+                   <svg class="icon">
+                      <use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use>
+                   </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Vuoi davvero disattivare la configurazione " %}
+                   <b>{{ configuration }}</b> ?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="{% url 'uni_ticket_titulus:manager_category_protocol_configuration_disable' structure_slug=structure.slug category_slug=category.slug configuration_id=configuration.pk %}">
+                    <input class="btn btn-danger" type="submit" value="{% trans "Si, disattiva" %}">
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="modal fade" tabindex="-1" role="dialog" id="enableConfiguration">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% trans "Attivazione configurazione protocollo" %}
+                </h5>
+                <button class="btn-close" type="button"
+                        data-bs-dismiss="modal" aria-label="Close">
+                   <svg class="icon">
+                      <use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use>
+                   </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Vuoi davvero attivare la configurazione " %}
+                   <b>{{ configuration }}</b> ?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="{% url 'uni_ticket_titulus:manager_category_protocol_configuration_enable' structure_slug=structure.slug category_slug=category.slug configuration_id=configuration.pk %}">
+                    <input class="btn btn-success" type="submit" value="{% trans "Si, attiva" %}">
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="modal fade" tabindex="-1" role="dialog" id="deleteConfiguration">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% trans "Eliminazione configurazione protocollo" %}
+                </h5>
+                <button class="btn-close" type="button"
+                        data-bs-dismiss="modal" aria-label="Close">
+                   <svg class="icon">
+                      <use xlink:href="{% static 'svg/sprites.svg' %}#it-close"></use>
+                   </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Vuoi davvero eliminare la configurazione " %}
+                   <b>{{ configuration }}</b> ?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="{% url 'uni_ticket_titulus:manager_category_protocol_configuration_delete' structure_slug=structure.slug category_slug=category.slug configuration_id=configuration.pk %}">
+                    <input class="btn btn-danger" type="submit" value="{% trans 'Si, elimina' %}">
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock clean_content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script src="{% static 'js/titulus-formset.js' %}" type="text/javascript"></script>
+{% endblock %}
