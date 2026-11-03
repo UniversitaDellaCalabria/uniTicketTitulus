@@ -61,7 +61,7 @@ urlpatterns = [
         name="manager_category_protocol_configuration_enable",
     ),
     path(
-        'endpoint_titulus_webhook/', 
+        'endpoint-titulus-webhook/', 
         generic.endpoint_titulus_webhook, 
         name='endpoint_titulus_webhook'
     ),

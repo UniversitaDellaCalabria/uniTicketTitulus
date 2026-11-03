@@ -3,27 +3,27 @@ from .settings import *
 
 
 def check_default_app_installed():
-    return DEFAULT_TITULUS_APP in settings.INSTALLED_APPS
+    return TITULUS_APP in settings.INSTALLED_APPS
 
 def get_credentials_class():
     if not check_default_app_installed(): return None
-    return import_string(f"{DEFAULT_TITULUS_APP}.models.CredentialWSProtocollo")
+    return import_string(f"{TITULUS_APP}.models.{CREDENTIALS_CLASS}")
 
 def get_configuration_class():
     if not check_default_app_installed(): return None
-    return import_string(f"{DEFAULT_TITULUS_APP}.models.ConfigurationWSProtocollo")
+    return import_string(f"{TITULUS_APP}.models.{CONFIGURATION_CLASS}")
 
 def get_configuration_op_class():
     if not check_default_app_installed(): return None
-    return import_string(f"{DEFAULT_TITULUS_APP}.models.ConfigurationWSProtocolloOP")
+    return import_string(f"{TITULUS_APP}.models.{CONFIGURATION_OP_CLASS}")
 
 def get_configuration_cc_class():
     if not check_default_app_installed(): return None
-    return import_string(f"{DEFAULT_TITULUS_APP}.models.ConfigurationWSProtocolloCC")
+    return import_string(f"{TITULUS_APP}.models.{CONFIGURATION_CC_CLASS}")
 
 def get_configuration_additional_config_class():
     if not check_default_app_installed(): return None
-    return import_string(f"{DEFAULT_TITULUS_APP}.models.AdditionalConfigurationWSProtocollo")
+    return import_string(f"{TITULUS_APP}.models.{CONFIGURATION_ADDITIONAL_CLASS}")
 
 def get_active_protocol_configuration(structure, category):
     if not (structure and category): return False
@@ -39,9 +39,9 @@ def get_active_protocol_configuration(structure, category):
     return configuration_ws_protocollo.get_active_protocol_configuration(category)
 
 def protocolla(**kwargs):
-    func = import_string(f"{DEFAULT_TITULUS_APP}.services.trova_ed_esegui_flusso_protocollo") 
+    func = import_string(f"{TITULUS_APP}.services.{EXECUTE_FUNCTION}") 
     return func(**kwargs)
 
 def recupera_numero_protocollo(**kwargs):
-    func = import_string(f"{DEFAULT_TITULUS_APP}.services.recupera_numero_protocollo") 
+    func = import_string(f"{TITULUS_APP}.services.{GET_NUMBER_FUNCTION}") 
     return func(**kwargs)

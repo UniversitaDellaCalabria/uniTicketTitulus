@@ -1,6 +1,8 @@
 import hmac
 import logging
+
 from functools import wraps
+
 from django.conf import settings
 from django.http import HttpResponseServerError, HttpResponseForbidden
 
@@ -29,7 +31,8 @@ def require_titulus_auth(view_func):
         if not auth_header or not hmac.compare_digest(auth_header, expected_token):
             client_ip = request.META.get('REMOTE_ADDR', 'IP_SCONOSCIUTO')
             logger.warning(
-                f"[Webhook Auth] Tentativo di accesso negato da IP {client_ip}. Header Auth errato o mancante.")
+                f"[Webhook Auth] Tentativo di accesso negato da IP {client_ip}. Header Auth errato o mancante."
+            )
             return HttpResponseForbidden("Non autorizzato")  # Restituisce errore 403
 
         # Se passa il controllo, eseguiamo la view

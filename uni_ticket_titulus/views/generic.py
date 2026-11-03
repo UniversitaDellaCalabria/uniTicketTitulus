@@ -48,7 +48,7 @@ def endpoint_titulus_webhook(request):
                 return HttpResponse("OK", status=200)
             if tickets.count() > 1:
                 logger.error(
-                    f"[u:Titulus-Webhook] Ricevuto un NRECORD associato a più notifiche, nrecord: {nrecord_ricevuto}")
+                    f"[u:Titulus-Webhook] Ricevuto un NRECORD associato a più ticket, nrecord: {nrecord_ricevuto}")
                 return HttpResponse("OK", status=200)
             ticket = tickets.first()
             try:
