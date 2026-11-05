@@ -7,9 +7,6 @@ from bootstrap_italia_template.widgets import (
     BootstrapItaliaSelectWidget,
 )
 
-from uni_ticket.settings import CLOSING_LEVELS
-from uni_ticket_bootstrap_italia_template.widgets import UniTicketDateTimeWidget
-
 from .utils import *
 
 
